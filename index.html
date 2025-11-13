@@ -3,584 +3,578 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>React Windows UI Пример</title>
+    <title>Бот-друг</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            background: linear-gradient(135deg, #0078d7 0%, #106ebe 100%);
-            color: #323130;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-
-        .window-container {
+        
+        .container {
             width: 100%;
-            max-width: 900px;
-            background-color: #f3f2f1;
-            border-radius: 8px;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            display: flex;
-            flex-direction: column;
-            height: 600px;
         }
-
-        .window-header {
-            background-color: #0078d7;
+        
+        .header {
+            background: linear-gradient(to right, #4a6cf7, #7b52e0);
             color: white;
-            padding: 12px 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .auth-section, .chat-section, .admin-section {
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #4a6cf7;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #4a6cf7;
+            outline: none;
+        }
+        
+        button {
+            background: linear-gradient(to right, #4a6cf7, #7b52e0);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #6c757d, #5a6268);
+        }
+        
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background-color: #4a6cf7;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            background-color: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #4a6cf7;
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .qa-pair {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .user-info {
+            background-color: #f0f4ff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .window-title {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .window-controls {
-            display: flex;
-            gap: 8px;
-        }
-
-        .control-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .close { background-color: #e81123; }
-        .minimize { background-color: #ffb900; }
-        .maximize { background-color: #00bc0e; }
-
-        .window-body {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .nav-pane {
-            width: 220px;
-            background-color: #faf9f8;
-            border-right: 1px solid #edebe9;
-            padding: 16px 0;
-        }
-
-        .nav-item {
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .nav-item:hover {
-            background-color: #f3f2f1;
-        }
-
-        .nav-item.active {
-            background-color: #edebe9;
-            border-right: 2px solid #0078d7;
-        }
-
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .content-area {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .section {
-            background-color: white;
-            border-radius: 4px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #323130;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border-radius: 4px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background-color: #0078d7;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #106ebe;
-        }
-
-        .btn-secondary {
-            background-color: #f3f2f1;
-            color: #323130;
-            border: 1px solid #8a8886;
-        }
-
-        .btn-secondary:hover {
-            background-color: #edebe9;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .input-field {
-            padding: 8px 12px;
-            border: 1px solid #8a8886;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #0078d7;
-            box-shadow: 0 0 0 1px #0078d7;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #8a8886;
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .toggle-slider {
-            background-color: #0078d7;
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(20px);
-        }
-
-        .list-item {
-            padding: 12px;
-            border-bottom: 1px solid #edebe9;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .list-item:last-child {
-            border-bottom: none;
-        }
-
-        .checkbox {
-            width: 18px;
-            height: 18px;
-            border: 1px solid #8a8886;
-            border-radius: 2px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .checkbox.checked {
-            background-color: #0078d7;
-            border-color: #0078d7;
-        }
-
-        .checkbox.checked:after {
-            content: "✓";
-            color: white;
-            font-size: 12px;
-        }
-
-        .progress-container {
-            margin-top: 8px;
-        }
-
-        .progress-bar {
-            height: 4px;
-            background-color: #edebe9;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: #0078d7;
-            width: 65%;
-        }
-
-        .status-text {
-            font-size: 12px;
-            color: #605e5c;
-            margin-top: 4px;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .card {
-            background-color: #faf9f8;
-            border-radius: 4px;
-            padding: 16px;
-            border: 1px solid #edebe9;
-            transition: all 0.2s;
-        }
-
-        .card:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .card-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .card-description {
-            font-size: 14px;
-            color: #605e5c;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .window-body {
-                flex-direction: column;
-            }
-            
-            .nav-pane {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #edebe9;
-            }
-            
-            .nav-items {
-                display: flex;
-                overflow-x: auto;
-            }
-            
-            .nav-item {
-                flex-shrink: 0;
-            }
-            
-            .card-grid {
-                grid-template-columns: 1fr;
-            }
+        
+        .logout-btn {
+            background: linear-gradient(to right, #dc3545, #c82333);
         }
     </style>
 </head>
 <body>
-    <div class="window-container">
-        <div class="window-header">
-            <div class="window-title">React Windows UI Пример</div>
-            <div class="window-controls">
-                <div class="control-btn minimize"></div>
-                <div class="control-btn maximize"></div>
-                <div class="control-btn close"></div>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>Бот-друг</h1>
+            <p>Ваш виртуальный собеседник</p>
         </div>
         
-        <div class="window-body">
-            <div class="nav-pane">
-                <div class="nav-item active" data-page="home">
-                    <div class="nav-icon">🏠</div>
-                    <span>Главная</span>
+        <div class="content">
+            <!-- Секция авторизации -->
+            <div class="auth-section" id="authSection">
+                <h2>Вход / Регистрация</h2>
+                <div class="form-group">
+                    <label for="username">Имя пользователя:</label>
+                    <input type="text" id="username" placeholder="Введите имя пользователя">
                 </div>
-                <div class="nav-item" data-page="tasks">
-                    <div class="nav-icon">✓</div>
-                    <span>Задачи</span>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" placeholder="Введите пароль">
                 </div>
-                <div class="nav-item" data-page="settings">
-                    <div class="nav-icon">⚙️</div>
-                    <span>Настройки</span>
+                <button id="loginBtn">Войти</button>
+                <button id="registerBtn" class="btn-secondary">Зарегистрироваться</button>
+                <div id="authStatus" class="status-message"></div>
+            </div>
+            
+            <!-- Секция чата -->
+            <div class="chat-section" id="chatSection" style="display: none;">
+                <div class="user-info">
+                    <span>Вы вошли как: <strong id="currentUser"></strong></span>
+                    <button id="logoutBtn" class="logout-btn">Выйти</button>
                 </div>
-                <div class="nav-item" data-page="info">
-                    <div class="nav-icon">ℹ️</div>
-                    <span>Информация</span>
+                
+                <h2>Чат с ботом</h2>
+                <div class="chat-container" id="chatContainer">
+                    <div class="message bot-message">
+                        Привет! Я твой бот-друг. Напиши мне что-нибудь!
+                    </div>
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="userInput" placeholder="Введите сообщение...">
+                    <button id="sendBtn">Отправить</button>
                 </div>
             </div>
             
-            <div class="content-area">
-                <!-- Главная страница -->
-                <div id="home-page" class="page">
-                    <div class="section">
-                        <h2 class="section-title">Добро пожаловать</h2>
-                        <p>Это пример интерфейса в стиле Windows, созданный с помощью HTML и CSS. Интерфейс имитирует компоненты из библиотеки react-windows-ui.</p>
-                    </div>
-                    
-                    <div class="section">
-                        <h2 class="section-title">Быстрые действия</h2>
-                        <div class="button-group">
-                            <button class="btn btn-primary">Создать проект</button>
-                            <button class="btn btn-secondary">Открыть файл</button>
-                            <button class="btn btn-secondary">Импорт данных</button>
-                        </div>
-                    </div>
-                    
-                    <div class="section">
-                        <h2 class="section-title">Карточки</h2>
-                        <div class="card-grid">
-                            <div class="card">
-                                <div class="card-title">Проекты</div>
-                                <div class="card-description">Управление вашими проектами и задачами</div>
-                            </div>
-                            <div class="card">
-                                <div class="card-title">Аналитика</div>
-                                <div class="card-description">Статистика и отчеты по вашей деятельности</div>
-                            </div>
-                            <div class="card">
-                                <div class="card-title">Настройки</div>
-                                <div class="card-description">Персонализация интерфейса и параметров</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Страница задач -->
-                <div id="tasks-page" class="page hidden">
-                    <div class="section">
-                        <h2 class="section-title">Мои задачи</h2>
-                        <div class="input-group">
-                            <input type="text" class="input-field" placeholder="Добавить новую задачу...">
-                            <button class="btn btn-primary">Добавить</button>
-                        </div>
-                    </div>
-                    
-                    <div class="section">
-                        <h2 class="section-title">Список задач</h2>
-                        <div class="list">
-                            <div class="list-item">
-                                <div class="checkbox checked"></div>
-                                <span>Создать HTML пример</span>
-                            </div>
-                            <div class="list-item">
-                                <div class="checkbox checked"></div>
-                                <span>Добавить CSS стили</span>
-                            </div>
-                            <div class="list-item">
-                                <div class="checkbox"></div>
-                                <span>Реализовать JavaScript функциональность</span>
-                            </div>
-                            <div class="list-item">
-                                <div class="checkbox"></div>
-                                <span>Протестировать на разных устройствах</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Страница настроек -->
-                <div id="settings-page" class="page hidden">
-                    <div class="section">
-                        <h2 class="section-title">Настройки приложения</h2>
-                        <div class="list">
-                            <div class="list-item">
-                                <span>Темная тема</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="list-item">
-                                <span>Уведомления</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="list-item">
-                                <span>Автообновление</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="section">
-                        <h2 class="section-title">Использование памяти</h2>
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress-fill"></div>
-                            </div>
-                            <div class="status-text">65% использовано</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Страница информации -->
-                <div id="info-page" class="page hidden">
-                    <div class="section">
-                        <h2 class="section-title">О приложении</h2>
-                        <p>Это демонстрационный пример интерфейса, созданный с использованием HTML, CSS и JavaScript.</p>
-                        <p>Стили имитируют компоненты из библиотеки react-windows-ui, которая предоставляет элементы интерфейса в стиле Windows для React приложений.</p>
-                    </div>
-                    
-                    <div class="section">
-                        <h2 class="section-title">Функциональность</h2>
-                        <div class="list">
-                            <div class="list-item">
-                                <div class="checkbox checked"></div>
-                                <span>Адаптивный дизайн</span>
-                            </div>
-                            <div class="list-item">
-                                <div class="checkbox checked"></div>
-                                <span>Навигация между страницами</span>
-                            </div>
-                            <div class="list-item">
-                                <div class="checkbox checked"></div>
-                                <span>Интерактивные элементы</span>
-                            </div>
-                            <div class="list-item">
-                                <div class="checkbox"></div>
-                                <span>Темная тема (в разработке)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Секция администратора -->
+            <div class="admin-section" id="adminSection" style="display: none;">
+                <h2>Управление ответами бота</h2>
+                <p>Для добавления/редактирования ответов бота введите команду <code>deploystart</code> в чате.</p>
             </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно для добавления вопросов и ответов -->
+    <div class="modal" id="qaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Добавление вопросов и ответов</h3>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="questionInput">Вопрос:</label>
+                <input type="text" id="questionInput" placeholder="Введите вопрос">
+            </div>
+            
+            <div class="form-group">
+                <label for="answerInput">Ответ:</label>
+                <textarea id="answerInput" placeholder="Введите ответ" rows="3"></textarea>
+            </div>
+            
+            <button id="addQABtn">Добавить пару</button>
+            
+            <div id="qaList">
+                <h4>Существующие пары вопрос-ответ:</h4>
+                <div id="qaPairs"></div>
+            </div>
+            
+            <div id="qaStatus" class="status-message"></div>
         </div>
     </div>
 
     <script>
-        // Навигация между страницами
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                // Убираем активный класс у всех элементов
-                document.querySelectorAll('.nav-item').forEach(nav => {
-                    nav.classList.remove('active');
-                });
-                
-                // Добавляем активный класс к текущему элементу
-                this.classList.add('active');
-                
-                // Скрываем все страницы
-                document.querySelectorAll('.page').forEach(page => {
-                    page.classList.add('hidden');
-                });
-                
-                // Показываем выбранную страницу
-                const pageId = this.getAttribute('data-page') + '-page';
-                document.getElementById(pageId).classList.remove('hidden');
-            });
-        });
-
-        // Функциональность чекбоксов
-        document.querySelectorAll('.checkbox').forEach(checkbox => {
-            checkbox.addEventListener('click', function() {
-                this.classList.toggle('checked');
-            });
-        });
-
-        // Функциональность переключателей
-        document.querySelectorAll('.toggle-switch input').forEach(toggle => {
-            toggle.addEventListener('change', function() {
-                const status = this.checked ? 'включено' : 'выключено';
-                console.log(`Переключатель ${status}`);
-            });
-        });
-
-        // Добавление новой задачи
-        const taskInput = document.querySelector('#tasks-page .input-field');
-        const addTaskBtn = document.querySelector('#tasks-page .btn');
+        // Эмуляция хранения данных в JSON файлах
+        let users = JSON.parse(localStorage.getItem('users')) || {};
+        let answers = JSON.parse(localStorage.getItem('answers')) || {};
         
-        addTaskBtn.addEventListener('click', function() {
-            if (taskInput.value.trim() !== '') {
-                const taskList = document.querySelector('#tasks-page .list');
-                const newTask = document.createElement('div');
-                newTask.className = 'list-item';
-                newTask.innerHTML = `
-                    <div class="checkbox"></div>
-                    <span>${taskInput.value}</span>
-                `;
-                taskList.appendChild(newTask);
-                taskInput.value = '';
+        // Текущий пользователь
+        let currentUser = null;
+        
+        // DOM элементы
+        const authSection = document.getElementById('authSection');
+        const chatSection = document.getElementById('chatSection');
+        const adminSection = document.getElementById('adminSection');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const authStatus = document.getElementById('authStatus');
+        const currentUserSpan = document.getElementById('currentUser');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const qaModal = document.getElementById('qaModal');
+        const closeModal = document.getElementById('closeModal');
+        const questionInput = document.getElementById('questionInput');
+        const answerInput = document.getElementById('answerInput');
+        const addQABtn = document.getElementById('addQABtn');
+        const qaPairs = document.getElementById('qaPairs');
+        const qaStatus = document.getElementById('qaStatus');
+        
+        // База знаний бота по умолчанию
+        const defaultBotKnowledge = {
+            "привет": "Привет! Как дела?",
+            "как дела": "У меня всё отлично! А у тебя?",
+            "что делаешь": "Общаюсь с тобой!",
+            "кто ты": "Я твой бот-друг, созданный для общения",
+            "пока": "До свидания! Буду рад пообщаться снова!"
+        };
+        
+        // Инициализация
+        function init() {
+            // Если пользователь уже авторизован
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                showChat();
+            }
+            
+            // Загрузка ответов для текущего пользователя, если они есть
+            if (currentUser && !answers[`user-${currentUser}`]) {
+                answers[`user-${currentUser}`] = {...defaultBotKnowledge};
+                saveAnswers();
+            }
+        }
+        
+        // Сохранение пользователей
+        function saveUsers() {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        
+        // Сохранение ответов
+        function saveAnswers() {
+            localStorage.setItem('answers', JSON.stringify(answers));
+        }
+        
+        // Показать сообщение о статусе
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = `status-message ${type}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Регистрация
+        registerBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!username || !password) {
+                showStatus(authStatus, 'Заполните все поля', 'error');
+                return;
+            }
+            
+            if (users[username]) {
+                showStatus(authStatus, 'Пользователь уже существует', 'error');
+                return;
+            }
+            
+            users[username] = password;
+            saveUsers();
+            
+            // Создаем базу ответов для нового пользователя
+            answers[`user-${username}`] = {...defaultBotKnowledge};
+            saveAnswers();
+            
+            showStatus(authStatus, 'Регистрация успешна! Теперь войдите в систему', 'success');
+            usernameInput.value = '';
+            passwordInput.value = '';
+        });
+        
+        // Вход
+        loginBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!username || !password) {
+                showStatus(authStatus, 'Заполните все поля', 'error');
+                return;
+            }
+            
+            if (!users[username] || users[username] !== password) {
+                showStatus(authStatus, 'Неверное имя пользователя или пароль', 'error');
+                return;
+            }
+            
+            currentUser = username;
+            localStorage.setItem('currentUser', currentUser);
+            showChat();
+            usernameInput.value = '';
+            passwordInput.value = '';
+        });
+        
+        // Выход
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            authSection.style.display = 'block';
+            chatSection.style.display = 'none';
+            adminSection.style.display = 'none';
+        });
+        
+        // Показать чат
+        function showChat() {
+            authSection.style.display = 'none';
+            chatSection.style.display = 'block';
+            adminSection.style.display = 'block';
+            currentUserSpan.textContent = currentUser;
+            
+            // Загружаем ответы для текущего пользователя
+            if (!answers[`user-${currentUser}`]) {
+                answers[`user-${currentUser}`] = {...defaultBotKnowledge};
+                saveAnswers();
+            }
+        }
+        
+        // Отправка сообщения
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Добавляем сообщение пользователя в чат
+            addMessageToChat(message, 'user');
+            userInput.value = '';
+            
+            // Обработка специальной команды
+            if (message.toLowerCase() === 'deploystart') {
+                openQAModal();
+                return;
+            }
+            
+            // Ищем ответ в базе знаний пользователя
+            setTimeout(() => {
+                let response = "Извини, я не знаю, что ответить на это.";
                 
-                // Добавляем обработчик клика для нового чекбокса
-                newTask.querySelector('.checkbox').addEventListener('click', function() {
-                    this.classList.toggle('checked');
+                // Поиск подходящего ответа
+                for (const [question, answer] of Object.entries(answers[`user-${currentUser}`])) {
+                    if (message.toLowerCase().includes(question.toLowerCase())) {
+                        response = answer;
+                        break;
+                    }
+                }
+                
+                addMessageToChat(response, 'bot');
+            }, 500);
+        }
+        
+        // Добавление сообщения в чат
+        function addMessageToChat(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+            messageElement.textContent = message;
+            
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Открытие модального окна для добавления вопросов и ответов
+        function openQAModal() {
+            qaModal.style.display = 'flex';
+            loadQAPairs();
+        }
+        
+        // Закрытие модального окна
+        closeModal.addEventListener('click', () => {
+            qaModal.style.display = 'none';
+        });
+        
+        // Загрузка пар вопрос-ответ
+        function loadQAPairs() {
+            qaPairs.innerHTML = '';
+            
+            const userAnswers = answers[`user-${currentUser}`];
+            for (const [question, answer] of Object.entries(userAnswers)) {
+                const qaPair = document.createElement('div');
+                qaPair.classList.add('qa-pair');
+                qaPair.innerHTML = `
+                    <strong>В:</strong> ${question}<br>
+                    <strong>О:</strong> ${answer}
+                    <button class="delete-btn" data-question="${question}">Удалить</button>
+                `;
+                qaPairs.appendChild(qaPair);
+            }
+            
+            // Добавляем обработчики для кнопок удаления
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const question = e.target.getAttribute('data-question');
+                    delete answers[`user-${currentUser}`][question];
+                    saveAnswers();
+                    loadQAPairs();
                 });
+            });
+        }
+        
+        // Добавление новой пары вопрос-ответ
+        addQABtn.addEventListener('click', () => {
+            const question = questionInput.value.trim();
+            const answer = answerInput.value.trim();
+            
+            if (!question || !answer) {
+                showStatus(qaStatus, 'Заполните все поля', 'error');
+                return;
             }
+            
+            answers[`user-${currentUser}`][question] = answer;
+            saveAnswers();
+            
+            showStatus(qaStatus, 'Пара вопрос-ответ успешно добавлена', 'success');
+            questionInput.value = '';
+            answerInput.value = '';
+            loadQAPairs();
         });
-
-        // Обработка нажатия Enter в поле ввода задачи
-        taskInput.addEventListener('keypress', function(e) {
+        
+        // Обработчики событий
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                addTaskBtn.click();
+                sendMessage();
             }
         });
+        
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', (e) => {
+            if (e.target === qaModal) {
+                qaModal.style.display = 'none';
+            }
+        });
+        
+        // Инициализация при загрузке страницы
+        init();
     </script>
 </body>
 </html>
